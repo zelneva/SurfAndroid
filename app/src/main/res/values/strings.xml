@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Restaurants</string>
+    <string name="find_restaurant">Поиск ресторанов в вашем городе</string>
+    <string name="hint_search">Поиск</string>
+</resources>

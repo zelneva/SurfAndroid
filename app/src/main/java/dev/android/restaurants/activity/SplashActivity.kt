@@ -1,4 +1,4 @@
-package dev.android.restaurants
+package dev.android.restaurants.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Restaurants</string>
-    <string name="find_restaurant">Поиск ресторанов в вашем городе</string>
-    <string name="hint_search">Поиск</string>
+    <string name="find_restaurant">Find restaurant</string>
+    <string name="search">Find</string>
+
+
+    <string name="zomato_api_key">ce0601dd2bddc0e5062754af9b061700</string>
+    <string name="base_url">https://developers.zomato.com/</string>
+
+
 </resources>

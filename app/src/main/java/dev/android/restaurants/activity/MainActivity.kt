@@ -2,8 +2,11 @@ package dev.android.restaurants.activity
 
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -18,8 +21,10 @@ import dev.android.restaurants.activity.response.CityResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.restaurant_list_activity.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.toast
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -40,10 +45,20 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         setContentView(R.layout.activity_main)
 
         searchText = findViewById(R.id.searchView)
-        cityAdapter = CityAdapter(this.applicationContext, citiesArray)
+        cityAdapter = CityAdapter(citiesArray)
         listCities = findViewById(R.id.list_cities)
         listCities.adapter = cityAdapter
 
+        searchTextListner()
+
+        listCities.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
+            val intent = Intent(this, RestaurantListActivity::class.java)
+            intent.putExtra("cityId", citiesArray[position].id)
+            startActivity(intent)
+        }
+    }
+
+    private fun searchTextListner() {
         searchText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
             }
@@ -61,10 +76,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 loadCity(p0.toString())
             }
         })
-
-        listCities.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
-            toast("Click on " + citiesArray[position].id)
-        }
     }
 
     fun loadCity(searchTxt: String) {
@@ -79,6 +90,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         zomatoServiceApi.getCity(searchTxt, CITIES_COUNT)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribeWith(object : DisposableObserver<CityResponse>() {
                     override fun onNext(cityRes: CityResponse) {
                         cityResponse = cityRes
@@ -105,7 +117,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    inner class CityAdapter(context: Context, private var citiesList: ArrayList<City>) : BaseAdapter() {
+    inner class CityAdapter(private var citiesList: ArrayList<City>) : BaseAdapter() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
             val view: View?
@@ -138,9 +150,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
 
         fun invalidate() {
-            this.notifyDataSetChanged();
+            this.notifyDataSetChanged()
         }
-
     }
 
     private class ViewHolder(view: View?) {

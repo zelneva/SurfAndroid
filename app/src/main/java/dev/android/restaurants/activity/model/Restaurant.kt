@@ -24,3 +24,5 @@ data class Restaurant (
 
     @SerializedName("thumb")
     var photoURL: String)
+
+

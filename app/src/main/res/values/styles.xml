@@ -8,9 +8,18 @@
         <item name="colorAccent">@color/colorPrimaryLight</item>
     </style>
 
+    <style name="NoActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorGreen</item>
+        <item name="colorPrimaryDark">@color/colorDarkGreen</item>
+        <item name="colorAccent">@color/colorPrimaryLight</item>
+    </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/background_splash</item>
+    </style>
+
+    <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorGreen</item>
     </style>
 
 

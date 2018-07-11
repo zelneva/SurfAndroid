@@ -1,80 +1,83 @@
 package dev.android.restaurants.activity
 
+import android.app.ProgressDialog
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.Menu
+import android.widget.SearchView
+import android.widget.SearchView.OnQueryTextListener
 import dev.android.restaurants.R
-import dev.android.restaurants.activity.RetrofitAPI.DaggerRetrofitComponent
-import dev.android.restaurants.activity.RetrofitAPI.RetrofitModule
-import dev.android.restaurants.activity.RetrofitAPI.ZomatoAPI
+import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
+import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import dev.android.restaurants.activity.adapter.RestaurantListAdapter
 import dev.android.restaurants.activity.model.Restaurant
 import dev.android.restaurants.activity.response.RestaurantResponse
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.restaurant_list_activity.*
+import kotlinx.android.synthetic.main.activity_restaurant_list.*
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
-import javax.inject.Inject
-import android.content.Context
-import android.app.SearchManager
-import android.widget.SearchView
-import android.widget.SearchView.OnQueryTextListener
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
 
-    var restaurantArray: ArrayList<Restaurant > = ArrayList()
+    var restaurantArray: ArrayList<Restaurant> = ArrayList()
     lateinit var adapter: RestaurantListAdapter
 
-    @Inject
     lateinit var zomatoServiceApi: ZomatoAPI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.restaurant_list_activity)
+        setContentView(R.layout.activity_restaurant_list)
 
-        val intent = intent
         val cityId = intent.getIntExtra("cityId", 0)
+
+        zomatoServiceApi = RetrofitClient().getClient()
+
         restaurant_rv.layoutManager = LinearLayoutManager(this)
 
         loadListRestaurant(cityId)
 
-        adapter = RestaurantListAdapter(this, restaurantArray)
+        adapter = RestaurantListAdapter(this, restaurantArray) {
+            val intent = Intent(this, RestaurantDetailsActivity::class.java)
+            intent.putExtra("restaurantId", restaurantArray[it].id)
+            intent.putExtra("restaurantName", restaurantArray[it].name)
+            startActivity(intent)
+        }
+
         restaurant_rv.adapter = adapter
     }
 
-    fun loadListRestaurant(cityId: Int) {
-        var restaurantResponse: RestaurantResponse? = null
+    private fun loadListRestaurant(cityId: Int) {
 
-        DaggerRetrofitComponent.builder()
-                .retrofitModule(RetrofitModule())
-                .build()
-                .inject(this)
+        val callRestaurantList: Call<RestaurantResponse> = zomatoServiceApi.getListRestaurant(cityId)
 
-        zomatoServiceApi.getListRestaurant(cityId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableObserver<RestaurantResponse>() {
-                    override fun onNext(restaurantRes: RestaurantResponse) {
-                        restaurantResponse = restaurantRes
-                        info("RESTAURANT SIZE!!!!" + restaurantRes.restaurants.size)
-                    }
+        val progressDialog: ProgressDialog = ProgressDialog(this, R.style.DialogStyle)
+        progressDialog.max = 100
+        with(progressDialog) {
+            setMessage("Loading....")
+            show()
+        }
 
-                    override fun onError(e: Throwable) {
-                        finish()
-                    }
+        callRestaurantList.enqueue(object : Callback<RestaurantResponse> {
+            override fun onFailure(call: Call<RestaurantResponse>?, t: Throwable?) {
+                call!!.cancel()
+                progressDialog.dismiss()
+            }
 
-                    override fun onComplete() {
-                        if (restaurantResponse != null) {
-                            addListRestaurant(restaurantResponse!!)
-                            adapter.invalidate()
-                        }
-                    }
-                })
+            override fun onResponse(call: Call<RestaurantResponse>?, response: Response<RestaurantResponse>?) {
+                if (response != null) {
+                    addListRestaurant(response.body()!!)
+                    adapter.invalidate()
+                }
+                progressDialog.dismiss()
+            }
+
+        })
     }
 
     fun addListRestaurant(restaurantResponse: RestaurantResponse) {

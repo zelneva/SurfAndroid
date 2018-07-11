@@ -1,6 +1,7 @@
 package dev.android.restaurants.activity.adapter
 
 import android.content.Context
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,7 @@ import dev.android.restaurants.R
 import dev.android.restaurants.activity.model.Restaurant
 
 
-class RestaurantListAdapter(context: Context, private val restaurants: ArrayList<Restaurant>) : RecyclerView.Adapter<RestaurantListAdapter.ViewHolder>(){
+class RestaurantListAdapter(context: Context, private val restaurants: ArrayList<Restaurant>, val listener: (Int) -> Unit) : RecyclerView.Adapter<RestaurantListAdapter.ViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var filterList: ArrayList<Restaurant> = restaurants
@@ -35,7 +36,7 @@ class RestaurantListAdapter(context: Context, private val restaurants: ArrayList
                     .load(restaurant.photoURL)
                     .into(holder.photoRestaurant)
         }
-
+        return holder.bind(restaurants[position], position, listener)
     }
 
     override fun getItemCount(): Int {
@@ -75,10 +76,18 @@ class RestaurantListAdapter(context: Context, private val restaurants: ArrayList
         }
     }
 
+
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var name: TextView = view.findViewById(R.id.name_restaurant)
         var address: TextView = view.findViewById(R.id.address_restaurant)
         var rating: TextView = view.findViewById(R.id.rating_restaurant)
         var photoRestaurant: ImageView = view.findViewById(R.id.photo_restaurant)
+
+        fun bind(item: Restaurant, pos: Int, listener: (Int) -> Unit) = with(itemView) {
+            val cvItem = findViewById(R.id.card_view) as CardView
+            cvItem.setOnClickListener {
+                listener(pos)
+            }
+        }
     }
 }

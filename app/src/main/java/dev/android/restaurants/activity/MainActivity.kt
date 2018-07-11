@@ -1,38 +1,27 @@
 package dev.android.restaurants.activity
 
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import dev.android.restaurants.R
-import dev.android.restaurants.activity.RetrofitAPI.DaggerRetrofitComponent
-import dev.android.restaurants.activity.RetrofitAPI.RetrofitModule
-import dev.android.restaurants.activity.RetrofitAPI.ZomatoAPI
+import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
+import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import dev.android.restaurants.activity.model.City
 import dev.android.restaurants.activity.response.CityResponse
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.restaurant_list_activity.*
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.toast
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
-    val CITIES_COUNT = 5
-
-    @Inject
     lateinit var zomatoServiceApi: ZomatoAPI
 
     var citiesArray: ArrayList<City> = ArrayList()
@@ -49,6 +38,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         listCities = findViewById(R.id.list_cities)
         listCities.adapter = cityAdapter
 
+        zomatoServiceApi = RetrofitClient().getClient()
+
         searchTextListner()
 
         listCities.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
@@ -61,9 +52,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     private fun searchTextListner() {
         searchText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
+                citiesArray.clear()
+                cityAdapter.invalidate()
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                citiesArray.clear()
+                cityAdapter.invalidate()
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -80,33 +75,19 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     fun loadCity(searchTxt: String) {
 
-        var cityResponse: CityResponse? = null
+        val callCity:Call<CityResponse> = zomatoServiceApi.getCity(searchTxt)
+        callCity.enqueue(object: Callback<CityResponse>{
+            override fun onFailure(call: Call<CityResponse>?, t: Throwable?) {
+                call!!.cancel()
+            }
 
-        DaggerRetrofitComponent.builder()
-                .retrofitModule(RetrofitModule())
-                .build()
-                .inject(this)
-
-        zomatoServiceApi.getCity(searchTxt, CITIES_COUNT)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .subscribeWith(object : DisposableObserver<CityResponse>() {
-                    override fun onNext(cityRes: CityResponse) {
-                        cityResponse = cityRes
-                    }
-
-                    override fun onError(e: Throwable) {
-                        finish()
-                    }
-
-                    override fun onComplete() {
-                        if (cityResponse != null) {
-                            addCity(cityResponse!!)
-                            cityAdapter.invalidate()
-                        }
-                    }
-                })
+            override fun onResponse(call: Call<CityResponse>?, response: Response<CityResponse>?) {
+                if(response != null){
+                    addCity(response.body()!!)
+                    cityAdapter.invalidate()
+                }
+            }
+        })
     }
 
 
@@ -126,7 +107,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             if (convertView == null) {
                 view = layoutInflater.inflate(R.layout.city_list_item, parent, false)
                 vh = ViewHolder(view)
-                view.tag = vh
+                view!!.tag = vh
             } else {
                 view = convertView
                 vh = view.tag as ViewHolder

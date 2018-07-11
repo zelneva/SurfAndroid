@@ -6,5 +6,12 @@
     <string name="zomato_api_key">ce0601dd2bddc0e5062754af9b061700</string>
     <string name="base_url">https://developers.zomato.com/</string>
 
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="cuisines">Cuisines</string>
+    <string name="average_cost_for_two">Average cost for two</string>
+    <string name="rating">Rating</string>
+    <string name="review">Review</string>
+
 
 </resources>

@@ -1,9 +1,9 @@
 package dev.android.restaurants.activity
 
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -15,6 +15,7 @@ import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import dev.android.restaurants.activity.model.City
 import dev.android.restaurants.activity.response.CityResponse
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,33 +36,38 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
         searchText = findViewById(R.id.searchView)
         cityAdapter = CityAdapter(citiesArray)
-        listCities = findViewById(R.id.list_cities)
+        listCities = findViewById(R.id.list_cities) as ListView
+       // listCities.emptyView = empty
         listCities.adapter = cityAdapter
+
+        val toolbar: Toolbar = findViewById(R.id.toolbar_main)
+        setSupportActionBar(toolbar)
 
         zomatoServiceApi = RetrofitClient().getClient()
 
         searchTextListner()
 
         listCities.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
-            val intent = Intent(this, RestaurantListActivity::class.java)
-            intent.putExtra("cityId", citiesArray[position].id)
-            startActivity(intent)
+            startActivity(RestaurantListActivity.start(this, citiesArray[position].id))
         }
     }
 
     private fun searchTextListner() {
         searchText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
+                info("afterTextChanged")
                 citiesArray.clear()
                 cityAdapter.invalidate()
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                info("beforeTextChanged")
                 citiesArray.clear()
                 cityAdapter.invalidate()
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                info("onTextChanged")
 
                 if (searchText?.length()!! < 2) {
                     citiesArray.clear()

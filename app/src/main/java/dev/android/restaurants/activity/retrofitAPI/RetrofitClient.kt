@@ -15,7 +15,7 @@ class RetrofitClient {
         return provideZomatoServiceApi()
     }
 
-    private fun provideZomatoServiceApi(): ZomatoAPI {
+    fun provideZomatoServiceApi(): ZomatoAPI {
         return provideRetrofit().create(ZomatoAPI::class.java)
     }
 

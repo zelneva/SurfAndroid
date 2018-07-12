@@ -11,11 +11,11 @@ import android.view.Menu
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import dev.android.restaurants.R
-import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
-import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import dev.android.restaurants.activity.adapter.RestaurantListAdapter
 import dev.android.restaurants.activity.model.Restaurant
 import dev.android.restaurants.activity.response.RestaurantResponse
+import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
+import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import kotlinx.android.synthetic.main.activity_restaurant_list.*
 import org.jetbrains.anko.AnkoLogger
 import retrofit2.Call
@@ -30,11 +30,20 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
 
     lateinit var zomatoServiceApi: ZomatoAPI
 
+    companion object {
+        val cityId = "cityId"
+        fun start(context: Context, id: Int): Intent {
+            val intent = Intent(context, RestaurantListActivity::class.java)
+            intent.putExtra(cityId, id)
+            return intent
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant_list)
 
-        val cityId = intent.getIntExtra("cityId", 0)
+        val cityId = intent.getIntExtra(cityId, 0)
 
         zomatoServiceApi = RetrofitClient().getClient()
 
@@ -43,10 +52,7 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
         loadListRestaurant(cityId)
 
         adapter = RestaurantListAdapter(this, restaurantArray) {
-            val intent = Intent(this, RestaurantDetailsActivity::class.java)
-            intent.putExtra("restaurantId", restaurantArray[it].id)
-            intent.putExtra("restaurantName", restaurantArray[it].name)
-            startActivity(intent)
+            startActivity(RestaurantDetailsActivity.start(this, restaurantArray[it].id, restaurantArray[it].name))
         }
 
         restaurant_rv.adapter = adapter

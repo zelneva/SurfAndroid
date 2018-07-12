@@ -1,6 +1,8 @@
 package dev.android.restaurants.activity
 
 import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
@@ -26,20 +28,31 @@ class RestaurantDetailsActivity : AppCompatActivity() {
 
     lateinit var zomatoServiceApi: ZomatoAPI
 
+    companion object {
+        val restaurantId: String = "restaurantId"
+        val restaurantName: String = "restaurantName"
+        fun start(context: Context, id: Int, name: String): Intent {
+            val intent = Intent(context, RestaurantDetailsActivity::class.java)
+            intent.putExtra(restaurantId, id)
+            intent.putExtra(restaurantName,name)
+            return intent
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant_details)
 
         zomatoServiceApi = RetrofitClient().getClient()
 
-        val resId = intent.getIntExtra("restaurantId", 0)
+        val resId = intent.getIntExtra(restaurantId, 0)
         loadRestaurantDetails(resId)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
-        val title = SpannableString(intent.getStringExtra("restaurantName"))
+        val title = SpannableString(intent.getStringExtra(restaurantName))
         supportActionBar!!.title = title
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
@@ -58,15 +71,15 @@ class RestaurantDetailsActivity : AppCompatActivity() {
         }
 
         callResayurantDetails.enqueue(object : Callback<RestaurantDetails> {
-            override fun onFailure(call: Call<RestaurantDetails>?, t: Throwable?) {
+            override fun onFailure(call: Call<RestaurantDetails>, t: Throwable) {
                 progressDialog.dismiss()
-                call!!.cancel()
+                call.cancel()
             }
 
-            override fun onResponse(call: Call<RestaurantDetails>?, response: Response<RestaurantDetails>?) {
-                if (response != null) {
+            override fun onResponse(call: Call<RestaurantDetails>, response: Response<RestaurantDetails>) {
+
                     addDetailsRestaurant(response.body()!!)
-                }
+
                 progressDialog.dismiss()
             }
         })

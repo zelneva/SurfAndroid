@@ -42,8 +42,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
         setSupportActionBar(toolbar)
 
-//        zomatoServiceApi =
-
         searchTextListner()
 
         listCities.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
@@ -98,9 +96,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     fun addCity(cityResponse: CityResponse) {
         citiesArray.clear()
-        for (item in cityResponse.cities) {
-            citiesArray.add(City(item.id, item.name, item.country_name))
-        }
+        citiesArray.addAll(cityResponse.cities)
     }
 
     inner class CityAdapter(private var citiesList: ArrayList<City>) : BaseAdapter() {

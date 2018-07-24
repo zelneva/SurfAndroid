@@ -29,8 +29,6 @@ import retrofit2.Response
 
 class RestaurantDetailsActivity : AppCompatActivity() {
 
-//    lateinit var zomatoServiceApi: ZomatoAPI
-
     companion object {
         val restaurantId: String = "restaurantId"
         val restaurantName: String = "restaurantName"
@@ -45,8 +43,6 @@ class RestaurantDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant_details)
-
-//        zomatoServiceApi = RetrofitClient().getClient()
 
         val resId = intent.getIntExtra(restaurantId, 0)
         loadRestaurantDetails(resId)

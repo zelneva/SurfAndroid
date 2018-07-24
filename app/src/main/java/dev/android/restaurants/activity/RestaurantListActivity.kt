@@ -29,8 +29,6 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
     var restaurantArray: ArrayList<Restaurant> = ArrayList()
     lateinit var adapter: RestaurantListAdapter
 
-//    lateinit var zomatoServiceApi: ZomatoAPI
-
     companion object {
         val cityId = "cityId"
         fun start(context: Context, id: Int): Intent {
@@ -45,8 +43,6 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
         setContentView(R.layout.activity_restaurant_list)
 
         val cityId = intent.getIntExtra(cityId, 0)
-
-//        zomatoServiceApi = RetrofitClient().getClient()
 
         restaurant_rv.layoutManager = LinearLayoutManager(this)
 

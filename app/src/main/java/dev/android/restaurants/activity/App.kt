@@ -7,11 +7,12 @@ import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 class App : Application() {
 
     companion object {
-        var zomatoServiceApi: ZomatoAPI = RetrofitClient().getClient()
+        lateinit var zomatoServiceApi: ZomatoAPI
     }
 
 
     override fun onCreate() {
         super.onCreate()
+        zomatoServiceApi = RetrofitClient().getClient()
     }
 }

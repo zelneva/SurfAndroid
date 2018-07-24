@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import dev.android.restaurants.R
+import dev.android.restaurants.activity.App.Companion.zomatoServiceApi
 import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
 import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import dev.android.restaurants.activity.model.City
@@ -23,7 +24,6 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
 
-    lateinit var zomatoServiceApi: ZomatoAPI
 
     var citiesArray: ArrayList<City> = ArrayList()
     lateinit var cityAdapter: CityAdapter
@@ -37,13 +37,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         searchText = findViewById(R.id.searchView)
         cityAdapter = CityAdapter(citiesArray)
         listCities = findViewById(R.id.list_cities) as ListView
-       // listCities.emptyView = empty
         listCities.adapter = cityAdapter
 
         val toolbar: Toolbar = findViewById(R.id.toolbar_main)
         setSupportActionBar(toolbar)
 
-        zomatoServiceApi = RetrofitClient().getClient()
+//        zomatoServiceApi =
 
         searchTextListner()
 
@@ -141,8 +140,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    private class ViewHolder(view: View?) {
-        var city: TextView = view?.findViewById(R.id.city_name) as TextView
-        var counrty: TextView = view?.findViewById(R.id.county_name) as TextView
+    private class ViewHolder(view: View) {
+        var city: TextView = view.findViewById(R.id.city_name) as TextView
+        var counrty: TextView = view.findViewById(R.id.county_name) as TextView
     }
 }

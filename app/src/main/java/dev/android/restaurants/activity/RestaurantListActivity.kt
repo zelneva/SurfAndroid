@@ -11,6 +11,7 @@ import android.view.Menu
 import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import dev.android.restaurants.R
+import dev.android.restaurants.activity.App.Companion.zomatoServiceApi
 import dev.android.restaurants.activity.adapter.RestaurantListAdapter
 import dev.android.restaurants.activity.model.Restaurant
 import dev.android.restaurants.activity.response.RestaurantResponse
@@ -28,7 +29,7 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
     var restaurantArray: ArrayList<Restaurant> = ArrayList()
     lateinit var adapter: RestaurantListAdapter
 
-    lateinit var zomatoServiceApi: ZomatoAPI
+//    lateinit var zomatoServiceApi: ZomatoAPI
 
     companion object {
         val cityId = "cityId"
@@ -45,7 +46,7 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
 
         val cityId = intent.getIntExtra(cityId, 0)
 
-        zomatoServiceApi = RetrofitClient().getClient()
+//        zomatoServiceApi = RetrofitClient().getClient()
 
         restaurant_rv.layoutManager = LinearLayoutManager(this)
 
@@ -62,7 +63,7 @@ class RestaurantListActivity : AppCompatActivity(), AnkoLogger {
 
         val callRestaurantList: Call<RestaurantResponse> = zomatoServiceApi.getListRestaurant(cityId)
 
-        val progressDialog: ProgressDialog = ProgressDialog(this, R.style.DialogStyle)
+        val progressDialog = ProgressDialog(this, R.style.DialogStyle)
         progressDialog.max = 100
         with(progressDialog) {
             setMessage("Loading....")

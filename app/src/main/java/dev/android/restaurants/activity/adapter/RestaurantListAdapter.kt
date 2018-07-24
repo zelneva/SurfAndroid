@@ -84,10 +84,8 @@ class RestaurantListAdapter(context: Context, private val restaurants: ArrayList
         var photoRestaurant: ImageView = view.findViewById(R.id.photo_restaurant)
 
         fun bind(item: Restaurant, pos: Int, listener: (Int) -> Unit) = with(itemView) {
-            val cvItem = findViewById(R.id.card_view) as CardView
-            cvItem.setOnClickListener {
-                listener(pos)
-            }
+            val cvItem = findViewById<CardView>(R.id.card_view)
+            cvItem.setOnClickListener { listener(pos) }
         }
     }
 }

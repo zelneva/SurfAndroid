@@ -14,11 +14,14 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import com.squareup.picasso.Picasso
 import dev.android.restaurants.R
+import dev.android.restaurants.activity.App.Companion.zomatoServiceApi
 import dev.android.restaurants.activity.model.RestaurantDetails
 import dev.android.restaurants.activity.retrofitAPI.RetrofitClient
 import dev.android.restaurants.activity.retrofitAPI.ZomatoAPI
 import kotlinx.android.synthetic.main.activity_restaurant_details.*
 import org.jetbrains.anko.browse
+import org.jetbrains.anko.cameraManager
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,7 +29,7 @@ import retrofit2.Response
 
 class RestaurantDetailsActivity : AppCompatActivity() {
 
-    lateinit var zomatoServiceApi: ZomatoAPI
+//    lateinit var zomatoServiceApi: ZomatoAPI
 
     companion object {
         val restaurantId: String = "restaurantId"
@@ -43,7 +46,7 @@ class RestaurantDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant_details)
 
-        zomatoServiceApi = RetrofitClient().getClient()
+//        zomatoServiceApi = RetrofitClient().getClient()
 
         val resId = intent.getIntExtra(restaurantId, 0)
         loadRestaurantDetails(resId)
@@ -55,8 +58,6 @@ class RestaurantDetailsActivity : AppCompatActivity() {
         val title = SpannableString(intent.getStringExtra(restaurantName))
         supportActionBar!!.title = title
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-
     }
 
 
